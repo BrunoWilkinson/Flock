@@ -7,9 +7,8 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "FlockSubsystem.generated.h"
 
-/**
- * 
- */
+DECLARE_MULTICAST_DELEGATE_OneParam(FFlockOnCreateSessionComplete, bool, bWasSuccessful);
+
 UCLASS()
 class FLOCK_API UFlockSubsystem : public UGameInstanceSubsystem
 {
@@ -22,6 +21,8 @@ public:
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void DestroySession();
 	void StartSession();
+
+	FFlockOnCreateSessionComplete FlockOnCreateSessionComplete;
 	
 protected:
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccesful);

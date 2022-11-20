@@ -46,6 +46,7 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *LastSessionSettings))
 	{
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
+		FlockOnCreateSessionComplete.Broadcast(false);
 	}
 }
 
@@ -67,6 +68,11 @@ void UFlockSubsystem::StartSession()
 
 void UFlockSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccesful)
 {
+	if (SessionInterface)
+	{
+		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
+	}
+	FlockOnCreateSessionComplete.Broadcast(bWasSuccesful);
 }
 
 void UFlockSubsystem::OnFindSessionComplete(bool bWasSuccessful)
