@@ -90,6 +90,19 @@ void UFlockSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResul
 
 void UFlockSubsystem::DestroySession()
 {
+	if(!SessionInterface.IsValid())
+	{
+		FlockOnDestroySessionComplete.Broadcast(false);
+		return;
+	}
+
+	DestroySessionCompleteDelegateHandle = SessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
+
+	if(!SessionInterface->DestroySession(NAME_GameSession))
+	{
+		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
+		FlockOnDestroySessionComplete.Broadcast(false);
+	}
 }
 
 void UFlockSubsystem::StartSession()
@@ -150,6 +163,11 @@ void UFlockSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCom
 
 void UFlockSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccesful)
 {
+	if (SessionInterface)
+	{
+		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
+	}
+	FlockOnDestroySessionComplete.Broadcast(bWasSuccesful);
 }
 
 void UFlockSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccesful)
