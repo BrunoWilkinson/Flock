@@ -94,6 +94,20 @@ void UFlockSubsystem::DestroySession()
 
 void UFlockSubsystem::StartSession()
 {
+	if(!SessionInterface.IsValid())
+	{
+		FlockOnStartSessionComplete.Broadcast(false);
+		return;
+	}
+
+	StartSessionCompleteDelegateHandle = SessionInterface->AddOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegate);
+
+	if (!SessionInterface->StartSession(NAME_GameSession))
+	{
+		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
+		FlockOnStartSessionComplete.Broadcast(false);
+	}
+
 }
 
 void UFlockSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccesful)
@@ -140,4 +154,9 @@ void UFlockSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSucce
 
 void UFlockSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccesful)
 {
+	if (SessionInterface)
+	{
+		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
+	}
+	FlockOnStartSessionComplete.Broadcast(bWasSuccesful);
 }
