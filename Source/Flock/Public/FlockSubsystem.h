@@ -7,7 +7,11 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "FlockSubsystem.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FFlockOnCreateSessionComplete, bool, bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFLockOnCreateSessionComplete, bool, bWasSuccessful);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FFlockOnFindSessionComplete, const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful);
+DECLARE_MULTICAST_DELEGATE_OneParam(FFlockOnJoinSessionComplete, EOnJoinSessionCompleteResult::Type Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFlockOnDestroySessionComplete, bool, bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFlockOnStartSessionComplete, bool, bWasSuccessful);
 
 UCLASS()
 class FLOCK_API UFlockSubsystem : public UGameInstanceSubsystem
@@ -22,7 +26,11 @@ public:
 	void DestroySession();
 	void StartSession();
 
-	FFlockOnCreateSessionComplete FlockOnCreateSessionComplete;
+	FFLockOnCreateSessionComplete FlockOnCreateSessionComplete;
+	FFlockOnFindSessionComplete FlockOnFindSessionComplete;
+	FFlockOnJoinSessionComplete FlockOnJoinSessionComplete;
+	FFlockOnDestroySessionComplete FlockOnDestroySessionComplete;
+	FFlockOnStartSessionComplete FlockOnStartSessionComplete;
 	
 protected:
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccesful);
