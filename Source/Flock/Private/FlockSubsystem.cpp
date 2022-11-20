@@ -16,6 +16,7 @@ StartSessionCompleteDelegate(FOnStartSessionCompleteDelegate::CreateUObject(this
 	{
 		SessionInterface = OnlineSubsystem->GetSessionInterface();
 	}
+	LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 }
 
 void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
@@ -42,7 +43,6 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 	LastSessionSettings->bUsesPresence = true;
 	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
-	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *LastSessionSettings))
 	{
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
@@ -64,7 +64,6 @@ void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 	LastSessionSearch->bIsLanQuery = IOnlineSubsystem::Get()->GetSubsystemName() == NULL_SUBSYSTEM ? true : false;
 	LastSessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 
-	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	if (!SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef()))
 	{
 		SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegateHandle);
@@ -74,6 +73,19 @@ void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 
 void UFlockSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResult)
 {
+	if(!SessionInterface.IsValid())
+	{
+		FlockOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
+		return;
+	}
+
+	JoinSessionCompleteDelegateHandle = SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
+
+	if (!SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult))
+	{
+		SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
+		FlockOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
+	}
 }
 
 void UFlockSubsystem::DestroySession()
@@ -105,12 +117,21 @@ void UFlockSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 		FlockOnFindSessionComplete.Broadcast(LastSessionSearch->SearchResults, bWasSuccessful);
 		return;
 	}
-
 	FlockOnFindSessionComplete.Broadcast(LastSessionSearch->SearchResults, false);
 }
 
 void UFlockSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
+	if (SessionInterface)
+	{
+		SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
+	}
+	FlockOnJoinSessionComplete.Broadcast(Result);
+	/*
+	 * Need to return the an Address string from the delegate
+	 * FString Address;
+	 * SessionInterface->GetResolvedConnectString(NAME_GameSession, Address);
+	 */
 }
 
 void UFlockSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccesful)

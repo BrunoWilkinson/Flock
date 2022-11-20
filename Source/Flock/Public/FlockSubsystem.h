@@ -40,6 +40,8 @@ protected:
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccesful);
 	
 private:
+	const ULocalPlayer* LocalPlayer;
+	
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
 	TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
