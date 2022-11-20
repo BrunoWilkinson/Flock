@@ -34,7 +34,7 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 	CreateSessionCompleteDelegateHandle = SessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
 
 	LastSessionSettings = MakeShareable(new FOnlineSessionSettings());
-	LastSessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false;
+	LastSessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == NULL_SUBSYSTEM ? true : false;
 	LastSessionSettings->NumPublicConnections = NumPublicConnections;
 	LastSessionSettings->bAllowJoinInProgress = true;
 	LastSessionSettings->bAllowJoinViaPresence = true;
@@ -52,6 +52,24 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 
 void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 {
+	if(!SessionInterface.IsValid())
+	{
+		return;
+	}
+
+	FindSessionCompleteDelegateHandle = SessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegate);
+
+	LastSessionSearch = MakeShareable(new FOnlineSessionSearch());
+	LastSessionSearch->MaxSearchResults = MaxSearchResults;
+	LastSessionSearch->bIsLanQuery = IOnlineSubsystem::Get()->GetSubsystemName() == NULL_SUBSYSTEM ? true : false;
+	LastSessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	if (!SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef()))
+	{
+		SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegateHandle);
+		FlockOnFindSessionComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
+	}
 }
 
 void UFlockSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResult)
@@ -77,6 +95,18 @@ void UFlockSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSucces
 
 void UFlockSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 {
+	if(SessionInterface)
+	{
+		SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegateHandle);
+	}
+
+	if (LastSessionSearch->SearchResults.Num())
+	{
+		FlockOnFindSessionComplete.Broadcast(LastSessionSearch->SearchResults, bWasSuccessful);
+		return;
+	}
+
+	FlockOnFindSessionComplete.Broadcast(LastSessionSearch->SearchResults, false);
 }
 
 void UFlockSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
