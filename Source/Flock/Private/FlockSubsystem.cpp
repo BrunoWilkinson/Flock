@@ -25,6 +25,7 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 {
 	if (!IsValidSessionInterface())
 	{
+		FlockOnCreateSessionComplete.Broadcast(false);
 		return;
 	}
 
@@ -56,6 +57,7 @@ void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 {
 	if(!IsValidSessionInterface())
 	{
+		FlockOnFindSessionComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
 		return;
 	}
 
