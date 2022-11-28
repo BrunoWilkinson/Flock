@@ -48,6 +48,7 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 
 	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *LastSessionSettings))
 	{
+		UE_LOG(FlockLog, Error, TEXT("Failed to create a session."));
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
 		FlockOnCreateSessionComplete.Broadcast(false);
 	}
@@ -70,6 +71,7 @@ void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 
 	if (!SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef()))
 	{
+		UE_LOG(FlockLog, Error, TEXT("Failed to find sessions."));
 		SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegateHandle);
 		FlockOnFindSessionComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
 	}
@@ -87,6 +89,7 @@ void UFlockSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResul
 
 	if (!SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult))
 	{
+		UE_LOG(FlockLog, Error, TEXT("Failed to join a session."));
 		SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
 		FlockOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
 	}
@@ -104,6 +107,7 @@ void UFlockSubsystem::DestroySession()
 
 	if(!SessionInterface->DestroySession(NAME_GameSession))
 	{
+		UE_LOG(FlockLog, Error, TEXT("Failed to destroy a session."));
 		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
 		FlockOnDestroySessionComplete.Broadcast(false);
 	}
@@ -121,6 +125,7 @@ void UFlockSubsystem::StartSession()
 
 	if (!SessionInterface->StartSession(NAME_GameSession))
 	{
+		UE_LOG(FlockLog, Error, TEXT("Failed to start a session."));
 		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
 		FlockOnStartSessionComplete.Broadcast(false);
 	}
