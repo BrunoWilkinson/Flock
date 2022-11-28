@@ -7,6 +7,16 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "FlockSubsystem.generated.h"
 
+UENUM()
+enum class EFlockAction : uint8
+{
+	Create,
+	Find,
+	Join,
+	Destroy,
+	Start
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFLockOnCreateSessionComplete, bool, bWasSuccessful);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FFlockOnFindSessionComplete, const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful);
 DECLARE_MULTICAST_DELEGATE_OneParam(FFlockOnJoinSessionComplete, EOnJoinSessionCompleteResult::Type Result);
@@ -42,6 +52,7 @@ protected:
 	
 private:
 	bool IsValidSessionInterface() const;
+	void LogFailure(const EFlockAction FlockAction);
 	const ULocalPlayer* LocalPlayer;
 	
 	IOnlineSessionPtr SessionInterface;

@@ -48,7 +48,7 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 
 	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *LastSessionSettings))
 	{
-		UE_LOG(FlockLog, Error, TEXT("Failed to create a session."));
+		LogFailure(EFlockAction::Create);
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
 		FlockOnCreateSessionComplete.Broadcast(false);
 	}
@@ -71,7 +71,7 @@ void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 
 	if (!SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef()))
 	{
-		UE_LOG(FlockLog, Error, TEXT("Failed to find sessions."));
+		LogFailure(EFlockAction::Find);
 		SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegateHandle);
 		FlockOnFindSessionComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
 	}
@@ -89,7 +89,7 @@ void UFlockSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResul
 
 	if (!SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult))
 	{
-		UE_LOG(FlockLog, Error, TEXT("Failed to join a session."));
+		LogFailure(EFlockAction::Join);
 		SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
 		FlockOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
 	}
@@ -107,7 +107,7 @@ void UFlockSubsystem::DestroySession()
 
 	if(!SessionInterface->DestroySession(NAME_GameSession))
 	{
-		UE_LOG(FlockLog, Error, TEXT("Failed to destroy a session."));
+		LogFailure(EFlockAction::Destroy);
 		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
 		FlockOnDestroySessionComplete.Broadcast(false);
 	}
@@ -125,7 +125,7 @@ void UFlockSubsystem::StartSession()
 
 	if (!SessionInterface->StartSession(NAME_GameSession))
 	{
-		UE_LOG(FlockLog, Error, TEXT("Failed to start a session."));
+		LogFailure(EFlockAction::Start);
 		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
 		FlockOnStartSessionComplete.Broadcast(false);
 	}
@@ -195,4 +195,31 @@ bool UFlockSubsystem::IsValidSessionInterface() const
 	}
 	UE_LOG(FlockLog, Error, TEXT("Invalid SessionInterface."));
 	return false;
+}
+
+void UFlockSubsystem::LogFailure(const EFlockAction FlockAction)
+{
+	FString Action;
+	switch (FlockAction)
+	{
+	case FlockAction == EFlockAction::Create:
+		Action = TEXT("create");
+		break;
+	case FlockAction == EFlockAction::Find:
+		Action = TEXT("find");
+		break;
+	case FlockAction == EFlockAction::Join:
+		Action = TEXT("join");
+		break;
+	case FlockAction == EFlockAction::Destroy:
+		Action = TEXT("destroy");
+		break;
+	case FlockAction == EFlockAction::Start:
+		Action = TEXT("start");
+		break;
+	default:
+		UE_LOG(FlockLog, Error, TEXT("Unkwown Flock Action."));
+		return;
+	}
+	UE_LOG(FlockLog, Error, TEXT("Failed to %s a session."), *Action);
 }
