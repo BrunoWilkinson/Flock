@@ -21,7 +21,7 @@ StartSessionCompleteDelegate(FOnStartSessionCompleteDelegate::CreateUObject(this
 	LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 }
 
-void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
+void UFlockSubsystem::CreateSession(const int32 NumPublicConnections, const FString MatchType)
 {
 	if (!IsValidSessionInterface())
 	{
@@ -54,7 +54,7 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 	}
 }
 
-void UFlockSubsystem::FindSession(int32 MaxSearchResults)
+void UFlockSubsystem::FindSession(const int32 MaxSearchResults)
 {
 	if(!IsValidSessionInterface())
 	{
@@ -131,7 +131,7 @@ void UFlockSubsystem::StartSession()
 	}
 }
 
-void UFlockSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
+void UFlockSubsystem::OnCreateSessionComplete(const FName SessionName, const bool bWasSuccessful)
 {
 	if (SessionInterface)
 	{
@@ -140,7 +140,7 @@ void UFlockSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSucces
 	FlockOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
 
-void UFlockSubsystem::OnFindSessionComplete(bool bWasSuccessful)
+void UFlockSubsystem::OnFindSessionComplete(const bool bWasSuccessful)
 {
 	if(SessionInterface)
 	{
@@ -155,7 +155,7 @@ void UFlockSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 	FlockOnFindSessionComplete.Broadcast(LastSessionSearch->SearchResults, false);
 }
 
-void UFlockSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+void UFlockSubsystem::OnJoinSessionComplete(const FName SessionName, const EOnJoinSessionCompleteResult::Type Result)
 {
 	if (SessionInterface)
 	{
@@ -169,7 +169,7 @@ void UFlockSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCom
 	 */
 }
 
-void UFlockSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+void UFlockSubsystem::OnDestroySessionComplete(const FName SessionName, const bool bWasSuccessful)
 {
 	if (SessionInterface)
 	{

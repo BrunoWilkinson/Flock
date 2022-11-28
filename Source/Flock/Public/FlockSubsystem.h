@@ -31,8 +31,8 @@ class FLOCK_API UFlockSubsystem : public UGameInstanceSubsystem
 
 public:
 	UFlockSubsystem();
-	void CreateSession(int32 NumPublicConnections, FString MatchType);
-	void FindSession(int32 MaxSearchResults);
+	void CreateSession(const int32 NumPublicConnections, const FString MatchType);
+	void FindSession(const int32 MaxSearchResults);
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void DestroySession();
 	void StartSession();
@@ -44,11 +44,11 @@ public:
 	FFlockOnStartSessionComplete FlockOnStartSessionComplete;
 	
 protected:
-	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnFindSessionComplete(bool bWasSuccessful);
-	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
-	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnCreateSessionComplete(const FName SessionName, const bool bWasSuccessful);
+	void OnFindSessionComplete(const bool bWasSuccessful);
+	void OnJoinSessionComplete(const FName SessionName, const EOnJoinSessionCompleteResult::Type Result);
+	void OnDestroySessionComplete(const FName SessionName, const bool bWasSuccessful);
+	void OnStartSessionComplete(const FName SessionName, const bool bWasSuccessful);
 	
 private:
 	bool IsValidSessionInterface() const;
