@@ -5,6 +5,8 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 
+DEFINE_LOG_CATEGORY(FlockLog);
+
 UFlockSubsystem::UFlockSubsystem() :
 CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
 FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete)),
@@ -21,7 +23,7 @@ StartSessionCompleteDelegate(FOnStartSessionCompleteDelegate::CreateUObject(this
 
 void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
 {
-	if (!SessionInterface.IsValid())
+	if (!IsValidSessionInterface())
 	{
 		return;
 	}
@@ -52,7 +54,7 @@ void UFlockSubsystem::CreateSession(int32 NumPublicConnections, FString MatchTyp
 
 void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 {
-	if(!SessionInterface.IsValid())
+	if(!IsValidSessionInterface())
 	{
 		return;
 	}
@@ -73,7 +75,7 @@ void UFlockSubsystem::FindSession(int32 MaxSearchResults)
 
 void UFlockSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResult)
 {
-	if(!SessionInterface.IsValid())
+	if(!IsValidSessionInterface())
 	{
 		FlockOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
 		return;
@@ -90,7 +92,7 @@ void UFlockSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResul
 
 void UFlockSubsystem::DestroySession()
 {
-	if(!SessionInterface.IsValid())
+	if(!IsValidSessionInterface())
 	{
 		FlockOnDestroySessionComplete.Broadcast(false);
 		return;
@@ -107,7 +109,7 @@ void UFlockSubsystem::DestroySession()
 
 void UFlockSubsystem::StartSession()
 {
-	if(!SessionInterface.IsValid())
+	if(!IsValidSessionInterface())
 	{
 		FlockOnStartSessionComplete.Broadcast(false);
 		return;
@@ -177,4 +179,14 @@ void UFlockSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccesf
 		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
 	}
 	FlockOnStartSessionComplete.Broadcast(bWasSuccesful);
+}
+
+bool UFlockSubsystem::IsValidSessionInterface() const
+{
+	if (SessionInterface.IsValid())
+	{
+		return true;
+	}
+	UE_LOG(FlockLog, Error, TEXT("Invalid SessionInterface."));
+	return false;
 }

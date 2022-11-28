@@ -12,6 +12,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FFlockOnFindSessionComplete, const TArray<F
 DECLARE_MULTICAST_DELEGATE_OneParam(FFlockOnJoinSessionComplete, EOnJoinSessionCompleteResult::Type Result);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFlockOnDestroySessionComplete, bool, bWasSuccessful);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFlockOnStartSessionComplete, bool, bWasSuccessful);
+DECLARE_LOG_CATEGORY_EXTERN(FlockLog, Error, All);
 
 UCLASS()
 class FLOCK_API UFlockSubsystem : public UGameInstanceSubsystem
@@ -40,6 +41,7 @@ protected:
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccesful);
 	
 private:
+	bool IsValidSessionInterface() const;
 	const ULocalPlayer* LocalPlayer;
 	
 	IOnlineSessionPtr SessionInterface;
