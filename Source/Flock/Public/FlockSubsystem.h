@@ -34,11 +34,11 @@ public:
 	FFlockOnStartSessionComplete FlockOnStartSessionComplete;
 	
 protected:
-	void OnCreateSessionComplete(FName SessionName, bool bWasSuccesful);
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
-	void OnDestroySessionComplete(FName SessionName, bool bWasSuccesful);
-	void OnStartSessionComplete(FName SessionName, bool bWasSuccesful);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 	
 private:
 	bool IsValidSessionInterface() const;

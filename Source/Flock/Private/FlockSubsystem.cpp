@@ -129,16 +129,15 @@ void UFlockSubsystem::StartSession()
 		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
 		FlockOnStartSessionComplete.Broadcast(false);
 	}
-
 }
 
-void UFlockSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccesful)
+void UFlockSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if (SessionInterface)
 	{
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
 	}
-	FlockOnCreateSessionComplete.Broadcast(bWasSuccesful);
+	FlockOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
 
 void UFlockSubsystem::OnFindSessionComplete(bool bWasSuccessful)
@@ -170,22 +169,22 @@ void UFlockSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCom
 	 */
 }
 
-void UFlockSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccesful)
+void UFlockSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if (SessionInterface)
 	{
 		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
 	}
-	FlockOnDestroySessionComplete.Broadcast(bWasSuccesful);
+	FlockOnDestroySessionComplete.Broadcast(bWasSuccessful);
 }
 
-void UFlockSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccesful)
+void UFlockSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if (SessionInterface)
 	{
 		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
 	}
-	FlockOnStartSessionComplete.Broadcast(bWasSuccesful);
+	FlockOnStartSessionComplete.Broadcast(bWasSuccessful);
 }
 
 bool UFlockSubsystem::IsValidSessionInterface() const
